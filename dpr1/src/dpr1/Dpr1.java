@@ -5,6 +5,8 @@
  */
 package dpr1;
 
+import java.util.HashMap;
+
 /**
  *
  * @author esparratacus
@@ -16,6 +18,8 @@ public class Dpr1 {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        HashMap servicesDirectory= new HashMap();
+        
     }
     
 }
