@@ -1,3 +1,5 @@
+package directory;
+
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,7 +47,7 @@ public class Directory {
         ArrayList<Service> list= getServices().get(name);
         if(list==null)
         {
-            getServices().put(name, new ArrayList<>());
+            getServices().put(name, new ArrayList());
         }
  
         boolean exist = false;
