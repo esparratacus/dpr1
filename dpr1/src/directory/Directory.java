@@ -1,6 +1,9 @@
 package directory;
 
 
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,12 +25,32 @@ public class Directory {
     
     private HashMap<String,ArrayList<Service>> services;
     private ArrayList<String> servers;
+    private ServerSocket server;
 
     public Directory() {
         this.services = new HashMap<>();
         this.servers= new ArrayList<>();
     }
-
+    
+    public void start() throws IOException 
+    {
+        this.server = new ServerSocket(6666);
+        while(true)
+        {
+            try{
+                
+                Socket actual;
+                actual = this.server.accept();
+                Gatekeeper gk = new Gatekeeper(actual, this);
+                gk.start();
+                System.out.println("Alguien se ha conectado");
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+    
     /*
     Método que retorna el hashmap con los servicios disponibles
     */

@@ -76,5 +76,9 @@ public class Service implements Serializable {
         this.port = port;
     }
     
+    public String toString()
+    {
+        return "nombre del Servicio: "+getName()+ " ip:"+getIp();
+    }
   
 }
