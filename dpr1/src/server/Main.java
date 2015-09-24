@@ -21,20 +21,24 @@ public class Main {
    
     public static void main(String[] args) {
         // TODO code application logic here
-        Server server = new Server("Traducor", "localhost", "4540");
+        Server server = new Server("Traductor", "localhost", "4540");
         server.start();
         
+        
+       
+        /*
         while(true){
         try {
             Thread.sleep(3000);
-          
             synchronized(server.getHiloDirectory()){
                server.getHiloDirectory().notify();
             }
         } catch (InterruptedException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
-        }
+                
+               
+        }*/
     }
     
 }

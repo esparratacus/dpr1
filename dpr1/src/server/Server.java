@@ -6,6 +6,8 @@
 package server;
 
 import directory.Service;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 /**
@@ -13,10 +15,20 @@ import java.util.logging.Logger;
  * @author david
  */
 public class Server {
-    public final static String DIRECTORY_IP = "localhost";
-    public final static Integer DIRECTORY_PORT = 4545;
+    public final static String DIRECTORY_IP = "192.168.0.10";
+    public final static Integer DIRECTORY_PORT = 6666;
     private final static Integer TIEMPO_RECONEXION = 5000;
+    private HashMap<String,ArrayList<Service>> services;
 
+    public HashMap<String, ArrayList<Service>> getServices() {
+        return services;
+    }
+
+    public void setServices(HashMap<String, ArrayList<Service>> services) {
+        this.services = services;
+    }
+    
+    
     public HiloDirectory getHiloDirectory() {
         return hiloDirectory;
     }
