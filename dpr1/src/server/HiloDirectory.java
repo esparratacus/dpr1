@@ -8,6 +8,7 @@ package server;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -34,16 +35,17 @@ public class HiloDirectory extends Thread implements Runnable{
         try {
             conexion = new Socket(Server.DIRECTORY_IP,Server.DIRECTORY_PORT);
             ObjectOutputStream out =new ObjectOutputStream(conexion.getOutputStream());
-            BufferedReader in = new BufferedReader( new InputStreamReader(conexion.getInputStream()));
             System.out.println("Intento de envío");
             out.writeObject(server.getService());
             System.out.println("Envía datos");
+            ObjectInputStream in = new ObjectInputStream(conexion.getInputStream());
         } catch (IOException ex) {
             ex.printStackTrace(); // tengo que re intentar que se conecte
             server.resetDirectory();// intento que se vuelva a correr de nuevo
         }
+        
         while(true){
-            
+            // Me quedo escuchando a cualquier Noificación del registry
             try {
                wait_();
                
