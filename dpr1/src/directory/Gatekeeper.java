@@ -40,6 +40,7 @@ public class Gatekeeper extends Thread implements Runnable {
             while(true)
             {
                 out.writeObject(directorio.getServices());
+                System.out.println("tamaño de servicios: "+ directorio.getServices().size());
                 synchronized(this)
                 {
                     wait();

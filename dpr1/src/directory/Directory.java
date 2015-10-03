@@ -1,7 +1,13 @@
 package directory;
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -23,15 +29,18 @@ import java.util.Map;
  */
 public class Directory {
     
-    private HashMap<String,ArrayList<Service>> services;
+    private static String ARCHIVO="directorio.ermi";
+    private Map<String,ArrayList<Service>> services=new  HashMap<>();
     private ArrayList<String> servers;
     private ServerSocket server;
     private ArrayList<Gatekeeper> gatekeepers;
 
     public Directory() {
-        this.services = new HashMap<>();
+        
+        this.services = services;
         this.servers= new ArrayList<>();
         this.gatekeepers=new ArrayList<>();
+        
     }
     
     public void start() throws IOException 
@@ -64,8 +73,23 @@ public class Directory {
     /*
     Método que retorna el hashmap con los servicios disponibles
     */
-    public Map<String, ArrayList<Service>> getServices() {
+    public synchronized Map<String, ArrayList<Service>> getServices() throws FileNotFoundException, IOException, ClassNotFoundException {
        // Map<String,ArrayList<Service>> syncServices= Collections.synchronizedMap(this.services);
+        File f= new File(ARCHIVO);
+                if(!f.exists())
+                {
+                    f.createNewFile();
+                }
+        if(f.length()<5)
+        {
+            return services;
+        }
+        FileInputStream fin = new FileInputStream(ARCHIVO);
+        ObjectInputStream oin = new ObjectInputStream(fin);
+        this.services = (Map)oin.readObject();
+        oin.close();
+        fin.close();
+        System.out.println("tamanio arch:"+ f.length());
         return services;
     }
 
@@ -75,34 +99,54 @@ public class Directory {
     /*
     Método que agrega un servicio al directorio
     */
-    public void addService(String ip, String port, String name)
+    public synchronized void addService(String ip, String port, String name) throws FileNotFoundException, IOException, ClassNotFoundException
     {
-        ArrayList<Service> list= getServices().get(name);
+        List<Service> list= getServices().get(name);
         if(list==null)
         {
-            getServices().put(name, new ArrayList());
+            synchronized(getServices())
+            {
+                getServices().put(name, new ArrayList());
+            }
+            
         }
         list=getServices().get(name);
         boolean exist = false;
+        if(list!=null){
         for (Service service : list) {
             if(service.getIp().equals(ip)&& service.getPort().equals(port))
             {
                 exist = true;
             }
-        }
+        }}
         if(!exist)
         {
             Service serv= new Service(name, ip, port);
-            this.services.get(name).add(serv);
+            synchronized(getServices()){
+                getServices().get(name).add(serv);
+                File f= new File(ARCHIVO);
+                if(!f.exists())
+                {
+                    f.createNewFile();
+                }
+                FileOutputStream fout = new FileOutputStream(f,false);
+                ObjectOutputStream out;
+                out = new ObjectOutputStream(fout);
+                out.writeObject(getServices());
+                out.close();
+                fout.close();
+                
+            }
             System.out.println("Servicio agregado al directorio");
         }
+        
         addServer(ip);
         
     }
     /*
     Método que elimina los objetos de tipo Services del hashmap que tengan la ip pasada por parámetro
     */
-    public void deleteServicesFromServer(String ip)
+    public void deleteServicesFromServer(String ip) throws IOException, FileNotFoundException, ClassNotFoundException
     {
       Iterator<Map.Entry<String, ArrayList<Service>>> iterator =getServices().entrySet().iterator();
       while(iterator.hasNext())
