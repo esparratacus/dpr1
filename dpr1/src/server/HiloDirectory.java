@@ -34,7 +34,7 @@ public class HiloDirectory extends Thread implements Runnable{
     }
     
     public void leerServidores(ObjectInputStream in) throws IOException, ClassNotFoundException{
-        System.out.println("Esperando por la respuesta del ");
+        System.out.println("Respuesta del Servidor ");
         Map<String, ArrayList<Service>> mapa  = (Map<String, ArrayList<Service>>) in.readObject();
         for (String key : mapa.keySet()) {
                ArrayList<Service> servicios = mapa.get(key);
@@ -51,9 +51,7 @@ public class HiloDirectory extends Thread implements Runnable{
         try {
             conexion = new Socket(Server.DIRECTORY_IP,Server.DIRECTORY_PORT);
             ObjectOutputStream out =new ObjectOutputStream(conexion.getOutputStream());
-            System.out.println("Intento de envío");
             out.writeObject(server.getService());
-            System.out.println("Envía datos");
             ObjectInputStream in = new ObjectInputStream(conexion.getInputStream());
             Service servicio  = server.getService();
             out.writeObject(servicio);
@@ -64,7 +62,7 @@ public class HiloDirectory extends Thread implements Runnable{
                 
         } catch (IOException ex) {
             ex.printStackTrace(); // tengo que re intentar que se conecte
-            server.resetDirectory();// intento que se vuelva a correr de nuevo
+         //   server.resetDirectory();// intento que se vuelva a correr de nuevo
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
         }

@@ -5,6 +5,8 @@
  */
 package server;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,27 +23,15 @@ public class Main {
     
    
     public static void main(String[] args) {
-        // TODO code application logic here
-        Scanner sc = new Scanner(System.in);
-        String linea = sc.nextLine();
-        Server server = new Server("Linea", "localhost", "4540");
-        server.start();
-        
-        
-       
-        /*
-        while(true){
         try {
-            Thread.sleep(3000);
-            synchronized(server.getHiloDirectory()){
-               server.getHiloDirectory().notify();
-            }
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            // TODO code application logic here
+            Scanner sc = new Scanner(System.in);
+            String linea = sc.nextLine();
+            Server server = new Server(linea, InetAddress.getLocalHost().toString(), "4540");
+            server.start();
+        } catch (UnknownHostException ex) {
+            ex.printStackTrace();
         }
-                
-               
-        }*/
     }
     
 }
