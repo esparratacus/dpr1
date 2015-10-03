@@ -26,10 +26,12 @@ public class Directory {
     private HashMap<String,ArrayList<Service>> services;
     private ArrayList<String> servers;
     private ServerSocket server;
+    private ArrayList<Gatekeeper> gatekeepers;
 
     public Directory() {
         this.services = new HashMap<>();
         this.servers= new ArrayList<>();
+        this.gatekeepers=new ArrayList<>();
     }
     
     public void start() throws IOException 
@@ -43,7 +45,15 @@ public class Directory {
                 actual = this.server.accept();
                 Gatekeeper gk = new Gatekeeper(actual, this);
                 gk.start();
+                this.gatekeepers.add(gk);
                 System.out.println("Alguien se ha conectado");
+                for (int i = 0; i < this.gatekeepers.size(); i++) {
+                    Gatekeeper g= gatekeepers.get(i);
+                    synchronized(g){
+                        g.notify();
+                    }
+                    
+                }
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -55,11 +65,11 @@ public class Directory {
     Método que retorna el hashmap con los servicios disponibles
     */
     public Map<String, ArrayList<Service>> getServices() {
-        Map<String,ArrayList<Service>> syncServices= Collections.synchronizedMap(this.services);
-        return syncServices;
+       // Map<String,ArrayList<Service>> syncServices= Collections.synchronizedMap(this.services);
+        return services;
     }
 
-    public void setServices(HashMap<String, ArrayList<Service>> services) {
+    /*public void setServices(HashMap<String, ArrayList<Service>> services) {
         this.services = services;
     }
     /*
@@ -72,7 +82,7 @@ public class Directory {
         {
             getServices().put(name, new ArrayList());
         }
- 
+        list=getServices().get(name);
         boolean exist = false;
         for (Service service : list) {
             if(service.getIp().equals(ip)&& service.getPort().equals(port))
