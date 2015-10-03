@@ -26,6 +26,7 @@ public class Gatekeeper extends Thread implements Runnable {
         this.directorio = directorio;
     }
     
+    @Override
     public void run()
     {
         
@@ -49,6 +50,7 @@ public class Gatekeeper extends Thread implements Runnable {
             
             
         } catch (IOException ex) {
+            ex.printStackTrace();
             Logger.getLogger(Gatekeeper.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Gatekeeper.class.getName()).log(Level.SEVERE, null, ex);

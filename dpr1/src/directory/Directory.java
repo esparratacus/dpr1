@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -30,192 +32,150 @@ import java.util.Map;
 public class Directory {
     
     private static String ARCHIVO="directorio.ermi";
-    private Map<String,ArrayList<Service>> services=new  HashMap<>();
-    private ArrayList<String> servers;
+    private HashMap<String,ArrayList<Service>> services=new  HashMap<>();
     private ServerSocket server;
     private ArrayList<Gatekeeper> gatekeepers;
+    private File dir;
 
     public Directory() {
-        
-        this.services = services;
-        this.servers= new ArrayList<>();
-        this.gatekeepers=new ArrayList<>();
+        this.gatekeepers = new ArrayList<>();
+        //services.put("dummy", new ArrayList<Service>());
+        dir = new File(ARCHIVO);
+        if(!dir.exists())
+        {
+            try {
+                dir.createNewFile();
+            } catch (IOException ex) {
+                Logger.getLogger(Directory.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
+            }
+        }
         
     }
     
-    public void start() throws IOException 
+    public void run()
     {
-        this.server = new ServerSocket(6666);
-        while(true)
-        {
-            try{
-                
-                Socket actual;
-                actual = this.server.accept();
-                Gatekeeper gk = new Gatekeeper(actual, this);
+        try {
+            server = new ServerSocket(6666);
+            Socket s;
+            while(true)
+            {
+                s = server.accept();
+                Gatekeeper gk = new Gatekeeper(s, this);
+                gatekeepers.add(gk);
                 gk.start();
-                this.gatekeepers.add(gk);
-                System.out.println("Alguien se ha conectado");
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Directory.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 for (int i = 0; i < this.gatekeepers.size(); i++) {
                     Gatekeeper g= gatekeepers.get(i);
                     synchronized(g){
                         g.notify();
                     }
-                    
                 }
+                
             }
-            catch (Exception e){
-                e.printStackTrace();
-            }
+        } catch (IOException ex) {
+            Logger.getLogger(Directory.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
-    /*
-    Método que retorna el hashmap con los servicios disponibles
-    */
-    public synchronized Map<String, ArrayList<Service>> getServices() throws FileNotFoundException, IOException, ClassNotFoundException {
-       // Map<String,ArrayList<Service>> syncServices= Collections.synchronizedMap(this.services);
-        File f= new File(ARCHIVO);
-                if(!f.exists())
-                {
-                    f.createNewFile();
-                }
-        if(f.length()<5)
+    public void addService(String ip, String port, String name)
+    {
+        Service s = new Service(name, ip, port);
+        ArrayList<Service> as= services.get(name);
+        if(as!=null)
         {
-            return services;
+            as.add(s);
+            
         }
-        FileInputStream fin = new FileInputStream(ARCHIVO);
-        ObjectInputStream oin = new ObjectInputStream(fin);
-        this.services = (Map)oin.readObject();
-        oin.close();
-        fin.close();
-        System.out.println("tamanio arch:"+ f.length());
+        else
+        {
+            services.put(name, new ArrayList<Service>());
+            services.get(name).add(s);
+            
+        }
+        salvarMapa();
+        
+    }
+    
+    public HashMap<String, ArrayList<Service>> getServices() {
+        cargarMapa();
         return services;
     }
 
-    /*public void setServices(HashMap<String, ArrayList<Service>> services) {
+    public void setServices(HashMap<String, ArrayList<Service>> services) {
         this.services = services;
     }
-    /*
-    Método que agrega un servicio al directorio
-    */
-    public synchronized void addService(String ip, String port, String name) throws FileNotFoundException, IOException, ClassNotFoundException
-    {
-        List<Service> list= getServices().get(name);
-        if(list==null)
-        {
-            synchronized(getServices())
-            {
-                getServices().put(name, new ArrayList());
-            }
-            
+
+    public ArrayList<Gatekeeper> getGatekeepers() {
+        return gatekeepers;
+    }
+
+    public void setGatekeepers(ArrayList<Gatekeeper> gatekeepers) {
+        this.gatekeepers = gatekeepers;
+    }
+
+    public File getDir() {
+        return dir;
+    }
+
+    public void setDir(File dir) {
+        this.dir = dir;
+    }
+
+    private void salvarMapa() {
+        HashMap<String, ArrayList<Service>> servs= services;
+        FileOutputStream fout=null;
+        ObjectOutputStream out=null;
+        try {
+            fout= new FileOutputStream(ARCHIVO);
+            out = new ObjectOutputStream(fout);
+            out.writeObject(servs);
+        
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Directory.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Directory.class.getName()).log(Level.SEVERE, null, ex);
         }
-        list=getServices().get(name);
-        boolean exist = false;
-        if(list!=null){
-        for (Service service : list) {
-            if(service.getIp().equals(ip)&& service.getPort().equals(port))
-            {
-                exist = true;
-            }
-        }}
-        if(!exist)
-        {
-            Service serv= new Service(name, ip, port);
-            synchronized(getServices()){
-                getServices().get(name).add(serv);
-                File f= new File(ARCHIVO);
-                if(!f.exists())
-                {
-                    f.createNewFile();
-                }
-                FileOutputStream fout = new FileOutputStream(f,false);
-                ObjectOutputStream out;
-                out = new ObjectOutputStream(fout);
-                out.writeObject(getServices());
+        finally{
+            try {
+                out.flush();
                 out.close();
+                fout.flush();
                 fout.close();
-                
-            }
-            System.out.println("Servicio agregado al directorio");
-        }
-        
-        addServer(ip);
-        
-    }
-    /*
-    Método que elimina los objetos de tipo Services del hashmap que tengan la ip pasada por parámetro
-    */
-    public void deleteServicesFromServer(String ip) throws IOException, FileNotFoundException, ClassNotFoundException
-    {
-      Iterator<Map.Entry<String, ArrayList<Service>>> iterator =getServices().entrySet().iterator();
-      while(iterator.hasNext())
-      {
-        Map.Entry<String, ArrayList<Service>> entry = iterator.next();
-        ArrayList<Service> arr = entry.getValue();
-          for (Service serv : arr) {
-              if (serv.getIp().equals(ip))
-              {
-                  arr.remove(serv);
-              }
-          }
-      }
-      removeServer(ip);
-    }
-    
-    
-    /*
-    Método que retorna la lista de servidores disponibles (esto será reeplazado al implementar nuestra clase HiloServidor)
-    */
-    public List<String> getServers()
-    {
-       List<String> synclist= Collections.synchronizedList(this.servers);
-       return synclist;
-    }
-    
-    
-    /*
-    Método que nos dice si una ip existe en nuestra lista de servidores (A ser reemplazdo cuando se implemente HiloServidor)
-    */
-    private boolean serverExist(String server)
-    {
-        List<String> servs= getServers();
-        boolean existe=false;
-        for (int i = 0; i < servs.size()&& !existe; i++) {
-            String actual= servs.get(i);
-            if(server.equals(actual))
-            {
-                existe = true;
+            } catch (IOException ex) {
+                Logger.getLogger(Directory.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        return existe;
     }
     
-    /*
-    Método que agrega una ip a la lista de servidores disponibles (deprecated)
-    */
-    public void addServer(String server)
-    {
-        if(!serverExist(server))
-            getServers().add(server);
-    }
-    
-    /*
-    Método que elimina una ip a la lista de servidores disponibles (deprecated)
-    */
-    
-    public void removeServer(String server)
-    {
-        boolean removed = false;
-        List<String> servs= getServers();
-        for (int i = 0; i < servs.size(); i++) 
-        {
-            if(servs.get(i).equals(server))
-            {
-                servs.remove(i);
-                removed=true;
+    private void cargarMapa(){
+        FileInputStream fin= null;
+        try {
+            fin = new FileInputStream(ARCHIVO);
+            ObjectInputStream in = new ObjectInputStream(fin);
+            services=(HashMap<String,ArrayList<Service>>)in.readObject();
+            in.close();
+            fin.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Directory.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Directory.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Directory.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                fin.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Directory.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
- 
     }
+    
+    
+
+    
 }
