@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  * @author david
  */
 public class Server {
-    public final static String DIRECTORY_IP = "10.5.53.210";
+    public final static String DIRECTORY_IP = "localhost";
     public final static Integer DIRECTORY_PORT = 6666;
     private final static Integer TIEMPO_RECONEXION = 5000;
     
@@ -58,7 +58,7 @@ public class Server {
         System.out.println("EMPIEZA");
         hiloDirectory = new HiloDirectory(this);
         hiloDirectory.start();
-        try {
+       /* try {
             ServerSocket server = new ServerSocket(Integer.parseInt(getService().getPort()));
             while(true){
                 Socket s = server.accept();
@@ -66,6 +66,6 @@ public class Server {
         } catch (IOException ex) {
             Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+        */
     }
 }

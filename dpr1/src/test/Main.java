@@ -5,6 +5,10 @@
  */
 package test;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author sala-c
@@ -15,9 +19,16 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
-        ExecutorExample example = new ExecutorExample();
-        example.ejecutar();
+        try {
+            // TODO code application logic here
+            Dir dir = new Dir();
+            dir.start();
+            
+            
+            
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
 }
