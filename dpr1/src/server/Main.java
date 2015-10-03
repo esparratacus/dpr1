@@ -5,6 +5,7 @@
  */
 package server;
 
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,7 +22,9 @@ public class Main {
    
     public static void main(String[] args) {
         // TODO code application logic here
-        Server server = new Server("Traductor", "localhost", "4540");
+        Scanner sc = new Scanner(System.in);
+        String linea = sc.nextLine();
+        Server server = new Server("Linea", "localhost", "4540");
         server.start();
         
         

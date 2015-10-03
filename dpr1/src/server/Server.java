@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  * @author david
  */
 public class Server {
-    public final static String DIRECTORY_IP = "192.168.0.10";
+    public final static String DIRECTORY_IP = "10.5.53.210";
     public final static Integer DIRECTORY_PORT = 6666;
     private final static Integer TIEMPO_RECONEXION = 5000;
     private HashMap<String,ArrayList<Service>> services;
@@ -50,7 +50,7 @@ public class Server {
             hiloDirectory.interrupt();
             hiloDirectory.start();
         } catch (InterruptedException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
         hiloDirectory.interrupt();
         hiloDirectory.start();
