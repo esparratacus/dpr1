@@ -6,17 +6,26 @@
 package directory;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
- * @author esparratacus
+ * @author david
  */
 public class Main {
-    public static void main(String[] args) throws IOException {
-        // TODO code application logic here
-       Directory dir = new Directory();
-       dir.start();
-        
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        try {
+            // TODO code application logic here
+            Directory dir = new Directory();
+            dir.start();
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
+    
 }
