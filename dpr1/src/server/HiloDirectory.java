@@ -6,16 +6,18 @@
 package server;
 
 import directory.Service;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 /**
  *
  * @author david
@@ -35,10 +37,12 @@ public class HiloDirectory extends Thread implements Runnable{
     
     public void leerServidores(ObjectInputStream in) throws IOException, ClassNotFoundException{
         System.out.println("Respuesta del Servidor ");
+        
         Map<String, ArrayList<Service>> mapa  = (Map<String, ArrayList<Service>>) in.readObject();
+        ArrayList<Service> servicios;
         for (String key : mapa.keySet()) {
-               ArrayList<Service> servicios = mapa.get(key);
-               for (Service servicio : servicios) {
+                servicios = mapa.get(key);
+                for (Service servicio : servicios) {
                    System.out.println("Servicio "+servicio.getName());
                 }
         }
@@ -51,10 +55,10 @@ public class HiloDirectory extends Thread implements Runnable{
         try {
             conexion = new Socket(Server.DIRECTORY_IP,Server.DIRECTORY_PORT);
             ObjectOutputStream out =new ObjectOutputStream(conexion.getOutputStream());
-            out.writeObject(server.getService());
             ObjectInputStream in = new ObjectInputStream(conexion.getInputStream());
-            Service servicio  = server.getService();
-            out.writeObject(servicio);
+            
+            System.out.println("Intento escribir en el objeto");
+            out.writeObject(server.getService());
             
             while(true){// leo el objeto mapa
                 leerServidores(in);
@@ -65,6 +69,12 @@ public class HiloDirectory extends Thread implements Runnable{
          //   server.resetDirectory();// intento que se vuelva a correr de nuevo
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
+        }finally{
+            try {
+                conexion.close();
+            } catch (IOException ex) {
+                Logger.getLogger(HiloDirectory.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         
         

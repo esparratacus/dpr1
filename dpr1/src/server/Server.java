@@ -11,6 +11,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 /**
@@ -24,14 +25,14 @@ public class Server {
     
     private Service service;
     HiloDirectory hiloDirectory;
-    private HashMap<String,ArrayList<Service>> services;
+    private HashMap<String,HashSet<Service>> services;
     private HashMap<String, String> traduccion;
 
-    public HashMap<String, ArrayList<Service>> getServices() {
+    public HashMap<String, HashSet<Service>> getServices() {
         return services;
     }
 
-    public void setServices(HashMap<String, ArrayList<Service>> services) {
+    public void setServices(HashMap<String, HashSet<Service>> services) {
         this.services = services;
     }
     

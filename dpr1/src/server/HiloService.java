@@ -9,6 +9,7 @@ import directory.Service;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  *
@@ -27,7 +28,7 @@ public class HiloService extends Thread implements Runnable {
     @Override
     public void run(){
         // Acá debo distribuir el mensaje entre múltiples servidores, hago join de cada uno de los pedazos y se lo devuelvo al cliente
-        HashMap<String, ArrayList<Service>> servidoresDisponibles = server.getServices();
+        HashMap<String, HashSet<Service>> servidoresDisponibles = server.getServices();
         String mensaje = "";
         String[] palabras = mensaje.split(" ");
         int cantidadPalabras = palabras.length;

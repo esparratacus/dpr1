@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package test;
+package rollback;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author sala-c
+ * @author david
  */
 public class Main {
 
@@ -23,9 +23,6 @@ public class Main {
             // TODO code application logic here
             Directory dir = new Directory();
             dir.start();
-            
-            
-            
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
