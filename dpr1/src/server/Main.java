@@ -23,15 +23,15 @@ public class Main {
     
    
     public static void main(String[] args) {
-        try {
-            // TODO code application logic here
-            Scanner sc = new Scanner(System.in);
-            String linea = sc.nextLine();
-            Server server = new Server(linea, InetAddress.getLocalHost().toString(), "4540");
-            server.start();
-        } catch (UnknownHostException ex) {
-            ex.printStackTrace();
-        }
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Ingrese el nombre del servicio");
+        String linea = sc.nextLine();
+        System.out.println("Ingrese la dirección IP");
+        String ip = sc.nextLine();
+        System.out.println("Ingrese el puerto");
+        String puerto = sc.nextLine();
+        Server server = new Server(linea, ip, puerto);
+        server.start();
     }
     
 }

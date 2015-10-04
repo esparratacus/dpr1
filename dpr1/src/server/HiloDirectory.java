@@ -11,10 +11,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,16 +35,19 @@ public class HiloDirectory extends Thread implements Runnable{
     }
     
     public void leerServidores(ObjectInputStream in) throws IOException, ClassNotFoundException{
-        System.out.println("Respuesta del Servidor ");
+        System.out.println("Respuesta del Servidor:");
         
-        Map<String, ArrayList<Service>> mapa  = (Map<String, ArrayList<Service>>) in.readObject();
+        ConcurrentHashMap<String, ArrayList<Service>> mapa  = (ConcurrentHashMap<String, ArrayList<Service>>) in.readObject();
         ArrayList<Service> servicios;
         for (String key : mapa.keySet()) {
                 servicios = mapa.get(key);
+                System.out.println("Servicio "+ key);
                 for (Service servicio : servicios) {
-                   System.out.println("Servicio "+servicio.getName());
+                    System.out.println("    "+ servicio.getIp() + ":"+ servicio.getPort());
                 }
         }
+        HashMap<String,ArrayList<Service>> hashMap = new HashMap<>(mapa);
+        server.setServices(hashMap);
     }
     
     @Override
