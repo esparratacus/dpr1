@@ -1,6 +1,10 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package directory;
-
-
+import directory.Service;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -10,26 +14,45 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
  *
- * @author esparratacus
+ * @author david
  */
 public class Directory {
     
-    private HashMap<String,ArrayList<Service>> services;
+    private volatile ConcurrentHashMap<String,ArrayList<Service>> services;
     private ArrayList<String> servers;
     private ServerSocket server;
+    private volatile ArrayList<Gatekeeper> gatekeepers;
 
+  
+    public void setServers(ArrayList<String> servers) {
+        this.servers = servers;
+    }
+
+    public ServerSocket getServer() {
+        return server;
+    }
+
+    public void setServer(ServerSocket server) {
+        this.server = server;
+    }
+
+    public ArrayList<Gatekeeper> getGatekeepers() {
+        return gatekeepers;
+    }
+
+    public void setGatekeepers(ArrayList<Gatekeeper> gatekeepers) {
+        this.gatekeepers = gatekeepers;
+    }
+    
     public Directory() {
-        this.services = new HashMap<>();
+        this.services = new ConcurrentHashMap<>();
         this.servers= new ArrayList<>();
+        this.gatekeepers=new ArrayList<>();
     }
     
     public void start() throws IOException 
@@ -38,28 +61,33 @@ public class Directory {
         while(true)
         {
             try{
-                
                 Socket actual;
                 actual = this.server.accept();
                 Gatekeeper gk = new Gatekeeper(actual, this);
                 gk.start();
-                System.out.println("Alguien se ha conectado");
-            }
-            catch (Exception e){
+                this.gatekeepers.add(gk);
+                
+            }catch (Exception e){
                 e.printStackTrace();
             }
         }
     }
-    
+    public void UpdateGatekeepers(){
+        for (Gatekeeper g : this.gatekeepers) {
+                    synchronized(g){
+                        g.notify();
+                    }
+                }
+    }
     /*
     Método que retorna el hashmap con los servicios disponibles
     */
-    public Map<String, ArrayList<Service>> getServices() {
-        Map<String,ArrayList<Service>> syncServices= Collections.synchronizedMap(this.services);
-        return syncServices;
+    public ConcurrentHashMap<String, ArrayList<Service>> getServices() {
+       // Map<String,ArrayList<Service>> syncServices= Collections.synchronizedMap(this.services);
+        return services;
     }
 
-    public void setServices(HashMap<String, ArrayList<Service>> services) {
+    /*public void setServices(HashMap<String, ArrayList<Service>> services) {
         this.services = services;
     }
     /*
@@ -72,7 +100,7 @@ public class Directory {
         {
             getServices().put(name, new ArrayList());
         }
- 
+        list=getServices().get(name);
         boolean exist = false;
         for (Service service : list) {
             if(service.getIp().equals(ip)&& service.getPort().equals(port))
@@ -84,9 +112,9 @@ public class Directory {
         {
             Service serv= new Service(name, ip, port);
             this.services.get(name).add(serv);
-            System.out.println("Servicio agregado al directorio");
         }
         addServer(ip);
+        System.out.println("Servicio Agregado");
         
     }
     /*

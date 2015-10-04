@@ -5,14 +5,18 @@
  */
 package server;
 
-import java.io.BufferedReader;
+import directory.Service;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 /**
  *
  * @author david
@@ -29,37 +33,52 @@ public class HiloDirectory extends Thread implements Runnable{
          wait();
          System.out.println("Fin de la espera");
     }
+    
+    public void leerServidores(ObjectInputStream in) throws IOException, ClassNotFoundException{
+        System.out.println("Respuesta del Servidor:");
+        
+        ConcurrentHashMap<String, ArrayList<Service>> mapa  = (ConcurrentHashMap<String, ArrayList<Service>>) in.readObject();
+        ArrayList<Service> servicios;
+        for (String key : mapa.keySet()) {
+                servicios = mapa.get(key);
+                System.out.println("Servicio "+ key);
+                for (Service servicio : servicios) {
+                    System.out.println("    "+ servicio.getIp() + ":"+ servicio.getPort());
+                }
+        }
+        HashMap<String,ArrayList<Service>> hashMap = new HashMap<>(mapa);
+        server.setServices(hashMap);
+    }
+    
+    @Override
     public void run(){
         
         System.out.println("Estableciendo conexión con el directorio...");
         try {
             conexion = new Socket(Server.DIRECTORY_IP,Server.DIRECTORY_PORT);
             ObjectOutputStream out =new ObjectOutputStream(conexion.getOutputStream());
-            System.out.println("Intento de envío");
-            out.writeObject(server.getService());
-            System.out.println("Envía datos");
             ObjectInputStream in = new ObjectInputStream(conexion.getInputStream());
+            
+            System.out.println("Intento escribir en el objeto");
+            out.writeObject(server.getService());
+            
+            while(true){// leo el objeto mapa
+                leerServidores(in);
+            }
+                
         } catch (IOException ex) {
             ex.printStackTrace(); // tengo que re intentar que se conecte
-            server.resetDirectory();// intento que se vuelva a correr de nuevo
-        }
-        
-        while(true){
-            // Me quedo escuchando a cualquier Noificación del registry
+         //   server.resetDirectory();// intento que se vuelva a correr de nuevo
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }finally{
             try {
-               wait_();
-               
-            } catch (InterruptedException ex) {
+                conexion.close();
+            } catch (IOException ex) {
                 Logger.getLogger(HiloDirectory.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
-            
-            if(conexion.isConnected()){
-                
-            }else{
-               //validar reconexión
-            }
         }
+        
         
     }
     

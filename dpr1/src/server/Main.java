@@ -5,6 +5,9 @@
  */
 package server;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,25 +23,15 @@ public class Main {
     
    
     public static void main(String[] args) {
-        // TODO code application logic here
-        Server server = new Server("Traductor", "localhost", "4540");
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Ingrese el nombre del servicio");
+        String linea = sc.nextLine();
+        System.out.println("Ingrese la dirección IP");
+        String ip = sc.nextLine();
+        System.out.println("Ingrese el puerto");
+        String puerto = sc.nextLine();
+        Server server = new Server(linea, ip, puerto);
         server.start();
-        
-        
-       
-        /*
-        while(true){
-        try {
-            Thread.sleep(3000);
-            synchronized(server.getHiloDirectory()){
-               server.getHiloDirectory().notify();
-            }
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
-                
-               
-        }*/
     }
     
 }
