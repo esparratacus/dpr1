@@ -9,17 +9,13 @@ import client.Message;
 import directory.Service;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -99,7 +95,7 @@ public class HiloRespuesta extends Thread implements Runnable{
                                 /* Toca Reenviar el Mensaje i */
                                 final Message nuevo = new Message(palabras[i], Message.TRADUCCION);
                                 final int servidorEscogido =(int) ((Math.random()*disponibles.size())% disponibles.size());
-                                disponibles = server.getServices().get("ingles");
+                                disponibles = server.getServices().get(server.getService().getName()); // traigo a todos mis pares
                                 final Service escogido = disponibles.get(servidorEscogido);
                                 futuros[i] = distribuirMensaje(nuevo, escogido, executorService);
                                 i--;
