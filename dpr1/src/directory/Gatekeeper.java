@@ -64,7 +64,6 @@ public class Gatekeeper extends Thread implements Runnable{
             ObjectOutputStream out = new ObjectOutputStream(listener.getOutputStream());
             Service n = (Service)oi.readObject();
             myService = n;
-            System.out.println("Estoy recibiendo");
             System.out.println(n.toString());
             this.directorio.addService(n.getIp(), n.getPort(), n.getName());
             directorio.UpdateGatekeepers();
@@ -81,9 +80,12 @@ public class Gatekeeper extends Thread implements Runnable{
         } catch (IOException ex) {
             System.out.println("Se desconectó un cliente");
             listener = null;
-            /* También hay que borrar del mapa */
             directorio.getServices().get(myService.getName()).remove(myService);
-            System.out.println("Ahora hay "+ directorio.getGatekeepers().size()+ "Hilos activos");
+            if(directorio.getServices().get(myService.getName()).isEmpty()){
+                System.out.println("Lista vacía BORRO" );
+                directorio.getServices().remove(myService.getName());
+            }
+            directorio.getServices();
             directorio.UpdateGatekeepers();
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Gatekeeper.class.getName()).log(Level.SEVERE, null, ex);

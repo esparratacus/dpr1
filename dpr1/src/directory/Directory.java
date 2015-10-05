@@ -62,7 +62,6 @@ public class Directory implements Runnable{
     
     public void start() throws IOException 
     {
-        System.out.println("Estoy entrando donde debo entrar tambien");
         this.server = new ServerSocket(6666);
         HiloCliente hc = new HiloCliente(this);
         hc.start();
@@ -89,10 +88,13 @@ public class Directory implements Runnable{
         }
         for(Gatekeeper g: gatekeepers){
             if(g.getListener() == null){
+                System.out.println("Hay un desconectado nuevo, se borrará");
                 toDelete.add(g);
             }
         }
-        gatekeepers.removeAll(toDelete);
+        synchronized(gatekeepers){
+            gatekeepers.removeAll(toDelete);
+        }
                 
     }
     /*
@@ -214,7 +216,6 @@ public class Directory implements Runnable{
         try {
             while(true)
             {
-                System.out.println("Ejecutando rutina de actualizaciòn de direcotrio");
                 UpdateGatekeepers();
                 Thread.sleep(7000);
             }

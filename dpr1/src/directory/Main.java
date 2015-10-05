@@ -22,13 +22,9 @@ public class Main {
         try {
             // TODO code application logic here
             Directory dir = new Directory();
-            System.out.println("Ejecutando monitor de servidores activos");
             Thread monitor= new Thread(dir);
             monitor.start();
-            System.out.println("El monitor està ahora vigilando las conecciones");
-            System.out.println("Ejecutando publicaciòn de servicios de directorio");
             dir.start();
-            
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
