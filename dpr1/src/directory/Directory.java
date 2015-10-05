@@ -13,20 +13,27 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
  *
  * @author david
  */
-public class Directory {
+public class Directory implements Runnable{
     
     private volatile ConcurrentHashMap<String,ArrayList<Service>> services;
     private ArrayList<String> servers;
     private ServerSocket server;
     private volatile ArrayList<Gatekeeper> gatekeepers;
 
-  
+    public void run_updater()
+    {
+        
+        
+    }   
+    
     public void setServers(ArrayList<String> servers) {
         this.servers = servers;
     }
@@ -55,6 +62,7 @@ public class Directory {
     
     public void start() throws IOException 
     {
+        System.out.println("Estoy entrando donde debo entrar tambien");
         this.server = new ServerSocket(6666);
         HiloCliente hc = new HiloCliente(this);
         hc.start();
@@ -199,5 +207,19 @@ public class Directory {
             }
         }
  
+    }
+
+    @Override
+    public void run() {
+        try {
+            while(true)
+            {
+                System.out.println("Ejecutando rutina de actualizaciòn de direcotrio");
+                UpdateGatekeepers();
+                Thread.sleep(7000);
+            }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Directory.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
