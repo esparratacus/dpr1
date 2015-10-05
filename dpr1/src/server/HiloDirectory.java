@@ -68,15 +68,29 @@ public class HiloDirectory extends Thread implements Runnable{
                 
         } catch (IOException ex) {
             ex.printStackTrace(); // tengo que re intentar que se conecte
-         //   server.resetDirectory();// intento que se vuelva a correr de nuevo
+            try {
+                System.out.println("Se perdió la conexión con el directorio, re intentando en 2 segundos");
+                Thread.sleep(2000);
+                run();
+            } catch (InterruptedException ex1) {
+                Logger.getLogger(HiloDirectory.class.getName()).log(Level.SEVERE, null, ex1);
+            }
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
+            try {
+                System.out.println("Se perdió la conexión con el directorio, re intentando en 2 segundos");
+                Thread.sleep(2000);
+                run();
+            } catch (InterruptedException ex1) {
+                Logger.getLogger(HiloDirectory.class.getName()).log(Level.SEVERE, null, ex1);
+            }
         }finally{
             try {
                 conexion.close();
             } catch (IOException ex) {
                 Logger.getLogger(HiloDirectory.class.getName()).log(Level.SEVERE, null, ex);
             }
+            
         }
         
         
