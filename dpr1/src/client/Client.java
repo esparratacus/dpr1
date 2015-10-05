@@ -5,7 +5,6 @@
  */
 package client;
 
-import directory.Directory;
 import directory.Service;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -14,10 +13,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import server.ServerTest;
 
 /**
  *
@@ -103,19 +100,21 @@ public class Client {
                    seleccionado = seleccionado.toLowerCase();
                    System.out.println("Escriba la cadena a traducir");
                    String aTraducir = sc.nextLine();
+                   aTraducir = aTraducir.toLowerCase();
                    try{
                     cliente.traducir(aTraducir, seleccionado);
                    }catch(Exception e){
-                       System.out.println("Servicio no Disponible");
+                       System.out.println("Servicio no Disponible, inténtelo de nuevo");
                    }
                     break;
                case Client.SALIR:
                    System.out.println("¡Adiós!");
                    System.exit(0);
                    break;
-           }
-           
-           
+               default:
+                   System.out.println("Operación NO soportada");
+                   break;
+           } 
         }while(op!=Client.SALIR);
     }
 
