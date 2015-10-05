@@ -3,48 +3,49 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package server;
+package client;
 
-import client.Message;
 import directory.Service;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import server.Server;
+import server.ServerTest;
 
 /**
  *
  * @author david
  */
-public class ServerTest {
+public class HiloObtenerServicios extends Thread implements Runnable {
+    private Client client;
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
+    public HiloObtenerServicios(Client client) {
+        this.client = client;
+    }
+    
+    @Override
+    public void run() {
         try {
-            // TODO code application logic here
-            Message message = new Message("day night food in the sun", Message.DISTRIBUIDO);
-            Socket socket = new Socket("45.55.68.26", 4534);
-            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+            Socket socket = new Socket("45.55.68.26", 3333);
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-            oos.writeObject(message);
-            Message respuesta =(Message) ois.readObject();
-            System.out.println("Traducción es:" +respuesta.getMessage());
+            ConcurrentHashMap<String, ArrayList<Service>> mapa = (ConcurrentHashMap<String, ArrayList<Service>>) ois.readObject();
+            HashMap<String,ArrayList<Service>> hashMap = new HashMap<>(mapa);
+            client.setServices(hashMap);
             ois.close();
-            oos.close();
             socket.close();
+
         } catch (IOException ex) {
             Logger.getLogger(ServerTest.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ServerTest.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
-    
+
 }

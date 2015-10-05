@@ -15,7 +15,7 @@ import java.util.Map;
  * @author david
  */
 public class Server {
-    public final static String DIRECTORY_IP = "localhost";
+    public final static String DIRECTORY_IP = "45.55.68.26";
     public final static Integer DIRECTORY_PORT = 6666;
     private final static Integer TIEMPO_RECONEXION = 5000;
     public final static String PALABRA_NO_ENCONTRADA = "[NO ECONTRADA]";

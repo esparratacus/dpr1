@@ -4,13 +4,11 @@
  * and open the template in the editor.
  */
 package directory;
-import directory.Service;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +56,8 @@ public class Directory {
     public void start() throws IOException 
     {
         this.server = new ServerSocket(6666);
+        HiloCliente hc = new HiloCliente(this);
+        hc.start();
         while(true)
         {
             try{
