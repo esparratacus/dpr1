@@ -32,7 +32,7 @@ public class HiloObtenerServicios extends Thread implements Runnable {
     @Override
     public void run() {
         try {
-            Socket socket = new Socket("45.55.68.26", 3333);
+            Socket socket = new Socket("localhost", 3333);
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
             ConcurrentHashMap<String, ArrayList<Service>> mapa = (ConcurrentHashMap<String, ArrayList<Service>>) ois.readObject();
             HashMap<String,ArrayList<Service>> hashMap = new HashMap<>(mapa);

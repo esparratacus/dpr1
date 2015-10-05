@@ -1,6 +1,8 @@
 package directory;
 
+import client.Message;
 import java.io.Serializable;
+import java.util.Objects;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -76,9 +78,32 @@ public class Service implements Serializable {
         this.port = port;
     }
     
+    @Override
     public String toString()
     {
         return "nombre del Servicio: "+getName()+ " ip:"+getIp();
     }
-  
+    @Override
+    public boolean equals(Object o){
+        if(o instanceof Service){
+            Service s = (Service) o;
+            boolean iguales = s.getIp().equals(ip) && s.getName().equals(name) && s.getPort().equals(port);
+            if(iguales){
+                System.out.println("Sin iguales");
+            }else{
+                System.out.println("No son iguales");
+            }
+            return iguales;
+        } 
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 73 * hash + Objects.hashCode(this.name);
+        hash = 73 * hash + Objects.hashCode(this.ip);
+        hash = 73 * hash + Objects.hashCode(this.port);
+        return hash;
+    }
 }

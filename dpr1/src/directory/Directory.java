@@ -73,11 +73,19 @@ public class Directory {
         }
     }
     public void UpdateGatekeepers(){
+        ArrayList<Gatekeeper> toDelete = new ArrayList<>();
         for (Gatekeeper g : this.gatekeepers) {
                     synchronized(g){
                         g.notify();
                     }
-                }
+        }
+        for(Gatekeeper g: gatekeepers){
+            if(g.getListener() == null){
+                toDelete.add(g);
+            }
+        }
+        gatekeepers.removeAll(toDelete);
+                
     }
     /*
     Método que retorna el hashmap con los servicios disponibles

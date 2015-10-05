@@ -21,10 +21,38 @@ public class Gatekeeper extends Thread implements Runnable{
     
     private Socket listener;
     private volatile Directory directorio;
+    private Service myService;
+
+    public Socket getListener() {
+        return listener;
+    }
+
+    public void setListener(Socket listener) {
+        this.listener = listener;
+    }
+
+    public Directory getDirectorio() {
+        return directorio;
+    }
+
+    public void setDirectorio(Directory directorio) {
+        this.directorio = directorio;
+    }
+
+    public Service getMyService() {
+        return myService;
+    }
+
+    public void setMyService(Service myService) {
+        this.myService = myService;
+    }
+    
+    
 
     public Gatekeeper(Socket listener, Directory directorio) {
         this.listener = listener;
         this.directorio = directorio;
+        myService = null;
     }
     
     @Override
@@ -35,6 +63,7 @@ public class Gatekeeper extends Thread implements Runnable{
             ObjectInputStream oi= new ObjectInputStream(listener.getInputStream());
             ObjectOutputStream out = new ObjectOutputStream(listener.getOutputStream());
             Service n = (Service)oi.readObject();
+            myService = n;
             System.out.println("Estoy recibiendo");
             System.out.println(n.toString());
             this.directorio.addService(n.getIp(), n.getPort(), n.getName());
@@ -51,8 +80,11 @@ public class Gatekeeper extends Thread implements Runnable{
             }
         } catch (IOException ex) {
             System.out.println("Se desconectó un cliente");
-            directorio.getGatekeepers().remove(this);
+            listener = null;
+            /* También hay que borrar del mapa */
+            directorio.getServices().get(myService.getName()).remove(myService);
             System.out.println("Ahora hay "+ directorio.getGatekeepers().size()+ "Hilos activos");
+            directorio.UpdateGatekeepers();
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Gatekeeper.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InterruptedException ex) {
