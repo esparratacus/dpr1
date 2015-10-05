@@ -6,9 +6,13 @@
 package server;
 
 import directory.Service;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 /**
  *
@@ -59,12 +63,18 @@ public class Server {
     }
     
     public void start(){
-        cargarServidor();
+        try{
+        File archivo = new File(service.getName());
+        cargarServidor(archivo);
         System.out.println("EMPIEZA");
         hiloDirectory = new HiloDirectory(this);
         hiloDirectory.start();
         hiloServicio = new HiloServicio(this);
         hiloServicio.start();
+        }catch(Exception e){
+            System.out.println("Error al cargar el archivo");
+            System.exit(0);
+        }
        /* try {
             ServerSocket server = new ServerSocket(Integer.parseInt(getService().getPort()));
             while(true){
@@ -87,7 +97,17 @@ public class Server {
         traduccion.put("the", "el");
         traduccion.put("day", "día");
     }
-
+    public void cargarServidor(File archivo) throws FileNotFoundException, IOException{
+        String cadena;
+        String[] trad;
+        FileReader f = new FileReader(archivo);
+        BufferedReader b = new BufferedReader(f);
+        while((cadena = b.readLine())!=null ) {
+            trad= cadena.split("\\s");
+            traduccion.put(trad[0],trad[1]);
+        }
+        b.close();
+    }
     void setServices(Map<String, String> hashMap) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

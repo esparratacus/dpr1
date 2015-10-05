@@ -34,7 +34,6 @@ public class HiloRespuesta extends Thread implements Runnable{
        return   executorService.submit(new Callable(){
             @Override
             public Object call() throws Exception {
-                        System.out.println("Empieza el callback");
                         Message message = nuevo;
                         Socket socket = new Socket(escogido.getIp(), Integer.parseInt(escogido.getPort()));
                         ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
@@ -44,7 +43,6 @@ public class HiloRespuesta extends Thread implements Runnable{
                         ois.close();
                         oos.close();
                         socket.close();
-                        System.out.println("Fin del callback");
                         return respuesta;
                     }
             });
@@ -69,7 +67,7 @@ public class HiloRespuesta extends Thread implements Runnable{
                     if(server.getServices() ==  null){
                         System.out.println("MIERDA HORRIBLE NO ACTUALIZA EL MAPA");
                     }
-                    disponibles = server.getServices().get("ingles");
+                    disponibles = server.getServices().get(server.getService().getName());
                     ExecutorService executorService = Executors.newFixedThreadPool(100);
                     String palabra;
                     for (int i = 0; i < palabras.length ; i++) {
